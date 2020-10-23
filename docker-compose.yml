@@ -1,0 +1,29 @@
+version: "2"
+services:
+  project-web:
+    container_name: project-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .dev.env
+    command: iex -S mix phx.server
+    ports:
+      - "1998:4000"
+    volumes:
+      - .:/app:cached
+    command: iex -S mix phx.server
+    networks:
+      - default
+    links:
+      - analytics-cassandra
+  analytics-cassandra:
+    image: cassandra:4.0
+    container_name: analytics-cassandra
+    ports:
+      - "9442:9042"
+    networks:
+      - default
+    volumes:
+      - ./cassandra/config/collectd.cassandra.conf:/etc/collectd/collectd.conf
+      - ./data/cassandra:/var/lib/cassandra
+

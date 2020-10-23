@@ -1,0 +1,12 @@
+version: "2"
+services:
+   analytics-cassandra:
+    image: cassandra
+    container_name: analytics-cassandra
+    ports:
+      - "9842:9042"
+    networks:
+      - default
+    volumes:
+      - ./cassandra/config/collectd.cassandra.conf:/etc/collectd/collectd.conf
+      - ./data/cassandra:/var/lib/cassandra
