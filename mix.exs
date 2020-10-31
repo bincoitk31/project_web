@@ -20,7 +20,7 @@ defmodule ProjectWeb.MixProject do
   def application do
     [
       mod: {ProjectWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :xandra]
     ]
   end
 
@@ -41,8 +41,10 @@ defmodule ProjectWeb.MixProject do
       {:telemetry_poller, "~> 0.4"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"},
-      {:xandra, "~> 0.13.1"}
+      {:xandra, "~> 0.13.1"},
+      {:cowboy, "~> 2.8.0"},
+      {:plug_cowboy, "~> 2.4.1"},
+      {:poolboy, "~> 1.5"}
     ]
   end
 

@@ -6,15 +6,17 @@ defmodule ProjectWeb.Application do
   use Application
 
   def start(_type, _args) do
+    import Supervisor.Spec
     children = [
       # Start the Telemetry supervisor
       ProjectWebWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: ProjectWeb.PubSub},
       # Start the Endpoint (http/https)
-      ProjectWebWeb.Endpoint
+      supervisor(ProjectWebWeb.Endpoint, []),
       # Start a worker by calling: ProjectWeb.Worker.start_link(arg)
       # {ProjectWeb.Worker, arg}
+      supervisor(ProjectWeb.CassandraClient, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

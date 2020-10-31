@@ -7,11 +7,13 @@
     "watch": "webpack --mode development --watch"
   },
   "dependencies": {
-    "phoenix": "file:../deps/phoenix",
-    "phoenix_html": "file:../deps/phoenix_html",
+    "antd": "^4.7.2",
     "axios": "^0.19.2",
     "immer": "^7.0.5",
     "lodash": "^4.17.20",
+    "phoenix": "file:../deps/phoenix",
+    "phoenix_html": "file:../deps/phoenix_html",
+    "react-router-dom": "^5.2.0",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
@@ -39,7 +41,7 @@
     "webpack-cli": "^3.3.2",
     "webpack-merge": "^5.0.9",
     "@babel/preset-react": "^7.0.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
   }
 }
