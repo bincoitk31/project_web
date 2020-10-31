@@ -1,20 +1,47 @@
-import React from "react";
-import ReactDOM from 'react-dom'
+import React, { Fragment } from "react";
+import ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import routes from './routes';
 
 export default class App extends React.Component {
-  render() {
-    return <div className="container">
-      <header className="header">
-        <nav role="navigation">
-          <ul className="nav nav-pills pull-right">
-            <li><a href="http://www.phoenixframework.org/docs">Get Started</a></li>
-          </ul>
-        </nav>
-        <span className="logo"></span>
-      </header>
-      {this.props.children}
-    </div>;
+  constructor(props) {
+    super(props);
+    
   }
+  showContentMenu = (routes) => {
+    var result = null;
+
+    if (routes.length > 0) {
+        result = routes.map((route, index) => {
+            return (
+              <Route 
+                  key={index} 
+                  path={route.path} 
+                  exact={route.exact} 
+                  component={route.main} 
+              />
+            );
+        });
+    }
+
+    return result;
+  }
+
+  render() {
+    return (
+      <Router>
+          <div className="app">
+              {/* Menu */}
+             
+              {/* Noi Dung */}
+              <Switch>
+                  { this.showContentMenu(routes) }
+              </Switch>
+          </div>
+      </Router>
+    );
+  } 
+  
 };
 
 ReactDOM.render(<App />, document.getElementById('__root'))

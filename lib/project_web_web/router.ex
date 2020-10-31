@@ -1,6 +1,8 @@
 defmodule ProjectWebWeb.Router do
   use ProjectWebWeb, :router
 
+  alias ProjectWebWeb.Plug.AccountPlug
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -13,10 +15,34 @@ defmodule ProjectWebWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :account do
+    plug AccountPlug
+  end
+
+  # pipeline :signup_layout do
+  #   plug :put_layout, {ProjectWebWeb.LayoutView, :sign_up}
+  # end
+
+  scope "/api", ProjectWebWeb do
+    pipe_through :api
+    
+    scope "/public" do
+      post "/signup", PageController, :sign_up_account
+    end
+    
+    scope "/private" do
+      
+    end
+  end
+
   scope "/", ProjectWebWeb do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/signup", PageController, :sign_up
+    get "/login", PageController, :login
+
+    pipe_through :account
     get "/dashboard", PageController, :single_page_app
   end
 
