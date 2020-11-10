@@ -8,7 +8,7 @@ defmodule ProjectWeb.CassandraClient do
   end
 
   def init([]) do
-    pool_size = if System.get_env("MIX_ENV") == "prod", do: 10, else: 5
+    pool_size = if System.get_env("MIX_ENV") == "prod", do: 20, else: 10
 
     pool_options = [
       {:name, {:local, :cassandra_pool}},
