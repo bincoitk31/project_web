@@ -13,7 +13,7 @@ defmodule ProjectWeb.Cassandra do
 
     {:ok, conn} = Xandra.start_link(nodes: ["#{host}:#{port}"])
     |> IO.inspect(label: "ddd")
-    Xandra.execute!(conn, "USE projecta;") |> IO.inspect(label: "OK")
+    #Xandra.execute!(conn, "USE projecta;") |> IO.inspect(label: "OK")
     {:ok, conn}
   end
 

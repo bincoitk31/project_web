@@ -13,7 +13,7 @@ const routes = [
     {
       path : '/dashboard',
       exact : true,
-      main : () => <Dashboard />
+      main : ({location}) => <Dashboard location={location}/>
     },
     {
       path : '/signup',

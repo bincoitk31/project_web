@@ -28,10 +28,13 @@ defmodule ProjectWebWeb.Router do
     
     scope "/public" do
       post "/signup", PageController, :sign_up_account
+      post "/login", PageController, :login_account
     end
     
     scope "/private" do
-      
+      pipe_through :account
+      post "/create_app", PageController, :create_app
+      get "/get_apps", PageController, :get_apps
     end
   end
 
@@ -44,6 +47,8 @@ defmodule ProjectWebWeb.Router do
 
     pipe_through :account
     get "/dashboard", PageController, :single_page_app
+    
+
   end
 
   # Other scopes may use custom stacks.

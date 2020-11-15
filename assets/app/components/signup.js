@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react';
-import { Redirect } from 'react-router-dom';
-import { Form, Input, Button,  Row, Col } from 'antd';
+import { useHistory, Redirect } from "react-router-dom";
+import { Form, Input, Button,  Row, Col, Modal, Space } from 'antd';
 import axios from 'axios';
 
 function Signup() {
@@ -10,7 +10,7 @@ function Signup() {
   const [password, setPassword] = useState()
   const [phoneNumber, setPhoneNumber] = useState()
   const [confirm, setConFirm] = useState()
-
+  let history = useHistory();
   const handleChange = (e) => {
     let name = e.target.name
     let value = e.target.value
@@ -34,10 +34,10 @@ function Signup() {
 
   const handleSubmit = () => {
     let params = {
-      firstName: firstName,
-      lastName: lastName,
+      first_name: firstName,
+      last_name: lastName,
       email: email,
-      phoneNumber: phoneNumber,
+      phone: phoneNumber,
       password: password,
       confirm: confirm
     }
@@ -46,11 +46,28 @@ function Signup() {
     axios.post(`/api/public/signup`, params )
     .then(res => {
       console.log(res, "resssssss")
+      if (res.status == 200 && res.data.success == true) {
+        modalSuccess()
+      }
     })
     .catch(err => {
       console.log(err, "err")
     })
 
+  }
+
+  const modalSuccess = () => {
+    
+    Modal.success({
+      content: 'You have signed up successfully',
+      okText: 'Continue',
+      afterClose: redirectTO("/login")
+    });
+  }
+
+  const redirectTO = (val) => {
+    console.log("vl")
+    history.push(val)
   }
 
   return <div className="container">
@@ -69,7 +86,9 @@ function Signup() {
         >
           <Row>
             <Col span={11}>
-              <Form.Item >
+              <Form.Item 
+                rules={[{ required: true, message: 'Please input your first name!' }]}
+              >
                 <label>First name</label>
                 <Input
                   type="text"
@@ -79,7 +98,9 @@ function Signup() {
             </Form.Item>
             </Col>
             <Col span={11} offset={2}>
-              <Form.Item >
+              <Form.Item 
+                rules={[{ required: true, message: 'Please input your last name!' }]}
+              >
                 <label>Last name</label>
                 <Input
                   type="text"
@@ -91,7 +112,9 @@ function Signup() {
           </Row>
           <Row>
             <Col span={24}>
-              <Form.Item>
+              <Form.Item
+                rules={[{ required: true, message: 'Please input your email!' }]}
+              >
                 <label>Email</label>
                 <Input 
                   type="email"
@@ -103,7 +126,9 @@ function Signup() {
           </Row>
           <Row>
             <Col span={24}>
-              <Form.Item>
+              <Form.Item
+                rules={[{ required: true, message: 'Please input your phone number!' }]}
+              >
                 <label>Phone number</label>
                 <Input 
                   type="number"
@@ -115,7 +140,9 @@ function Signup() {
           </Row>
           <Row>
             <Col span={24}>
-              <Form.Item>
+              <Form.Item 
+                rules={[{ required: true, message: 'Please input your password!' }]}
+              >
                 <label>Password</label>
                 <Input 
                   type="password"
@@ -152,7 +179,7 @@ function Signup() {
         </div> */}
         <div className="signup-more">
           <ul>
-            <li>Already have an account? <a>Login here.</a></li>
+            <li>Already have an account? <a href="/login">Login here.</a></li>
           </ul>
         </div>
       </Col>

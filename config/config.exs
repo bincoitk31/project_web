@@ -23,6 +23,10 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :project_web, ProjectWeb.Guardian,
+       issuer: "project_web",
+       secret_key: "KngK5GkbT7VQvTx1SbjQIF4C9j+PuspMDvH0uoC+AFX9xiY17ztiP3J0bQfd7nX4"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
