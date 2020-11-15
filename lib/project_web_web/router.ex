@@ -32,7 +32,9 @@ defmodule ProjectWebWeb.Router do
     end
     
     scope "/private" do
-      
+      pipe_through :account
+      post "/create_app", PageController, :create_app
+      get "/get_apps", PageController, :get_apps
     end
   end
 
@@ -45,7 +47,7 @@ defmodule ProjectWebWeb.Router do
 
     pipe_through :account
     get "/dashboard", PageController, :single_page_app
-    post "/dashboard/create_app", PageController, :create_app
+    
 
   end
 

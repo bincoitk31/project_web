@@ -46,7 +46,8 @@ defmodule ProjectWeb.MixProject do
       {:plug_cowboy, "~> 2.4.1"},
       {:poolboy, "~> 1.5"},
       {:bcrypt_elixir, "~> 2.2"},
-      {:guardian, "~> 2.1.1"}
+      {:guardian, "~> 2.1.1"},
+      {:elixir_uuid, "~> 1.2"}
     ]
   end
 

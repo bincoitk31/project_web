@@ -5,6 +5,7 @@ defmodule ProjectWebWeb.PageController do
   alias ProjectWeb.Guardian
   alias Accounts
   import Plug.Conn
+
   
 
   def index(conn, _params) do
@@ -28,7 +29,7 @@ defmodule ProjectWebWeb.PageController do
 
   def sign_up_account(conn, params) do
     IO.inspect(params, label: "paramssss")
-    id = Tools.randstring(24)
+    
     email = params["email"]
     first_name = params["first_name"]
     last_name = params["last_name"]
@@ -81,7 +82,56 @@ defmodule ProjectWebWeb.PageController do
     end
   end
 
-  def create_app(conn, _params) do
+  def create_app(conn, params) do
     IO.inspect(conn, label: "connnnnnnnn")
+    id = Tools.randstring(12)
+    domain = params["domain"]
+    name = params["name"]
+    removed = false
+    account_id = conn.assigns.id_user
+    add_new_app = "INSERT INTO projecta.apps (id, domain, name, removed, account_id) VALUES (?, ?, ?, ?, ?);"
+    CassandraClient.execute(add_new_app, [
+      {"text", id},
+      {"text", domain},
+      {"text", name},
+      {"boolean", removed},
+      {"uuid", account_id}
+    ])
+    |> IO.inspect(label: "insert success")
+
+    
+    query_apps = "SELECT * FROM projecta.apps"
+    
+    case CassandraClient.command(fn conn -> Xandra.execute(conn, query_apps) end) do
+      {:ok, %Xandra.Page{} = res} -> 
+        apps = Enum.to_list(res)
+        IO.inspect(apps, label: "apps")
+        json(conn, %{success: true, apps: apps})
+      
+      {:err, _} ->
+        conn
+        |> put_status(422)
+        |> json(%{success: false, message: "err insert new app"})
+
+      end
+    
+  end
+
+  def get_apps(conn, params) do
+    IO.inspect(conn.assigns.id_user, label: "id_user")
+    account_id = conn.assigns.id_user
+    query = "SELECT * FROM projecta.apps WHERE account_id=#{account_id} ALLOW FILTERING;"
+
+    case CassandraClient.command(fn conn -> Xandra.execute(conn, query) end) do
+      {:ok, %Xandra.Page{} = res} -> 
+        apps = Enum.to_list(res)
+        IO.inspect(apps, label: "apps")
+        json(conn, %{success: true, apps: apps})
+      {:err, _} ->
+        conn
+        |> put_status(422)
+        |> json(%{success: false, message: "err query apps"})
+
+    end
   end
 end

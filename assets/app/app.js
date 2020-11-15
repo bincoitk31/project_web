@@ -2,6 +2,8 @@ import React, { Fragment } from "react";
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import routes from './routes';
+import { Provider } from 'react-redux'
+import { store } from './store.js'
 
 export default class App extends React.Component {
   constructor(props) {
@@ -30,14 +32,14 @@ export default class App extends React.Component {
   render() {
     return (
       <Router>
+        <Provider store={store}>
           <div className="app">
-              {/* Menu */}
              
-              {/* Noi Dung */}
               <Switch>
                   { this.showContentMenu(routes) }
               </Switch>
           </div>
+        </Provider>
       </Router>
     );
   } 

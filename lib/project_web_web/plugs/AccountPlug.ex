@@ -6,7 +6,6 @@ defmodule ProjectWebWeb.Plug.AccountPlug do
   def init(opts), do: opts
 
   def call(conn, _) do
-    IO.inspect(conn.assigns, label: "tokennnnn")
     token = conn.cookies["__jwt"]
     case Guardian.decode_and_verify(token) do
       {:ok, claims} ->

@@ -22,6 +22,7 @@ class Dashboard extends Component {
     this.setState({ collapsed });
   };
 
+  
   render() {
     const { collapsed } = this.state;
     return <Layout style={{ minHeight: '100vh' }} className="dashboard-wrapper">

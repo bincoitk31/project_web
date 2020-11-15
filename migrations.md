@@ -12,6 +12,7 @@ create table apps (
   id text, 
   name text, 
   domain text, 
-  removed boolean, 
+  removed boolean,
+  account_id uuid, 
   PRIMARY KEY (id)
   );
