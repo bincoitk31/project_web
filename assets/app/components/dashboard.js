@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import Apps from './apps'
 import Analytis from "./analytics"
 
@@ -11,26 +11,25 @@ import {
 
 const { Header, Content, Footer, Sider } = Layout;
 
-class Dashboard extends Component {
-
-  state = {
-    collapsed: false,
-  };
-
-  onCollapse = collapsed => {
+function Dashboard() {
+  const [collapsed, setCollapsed] = useState(false)
+  const [tab, setTab] = useState("2")
+  const onCollapse = collapsed => {
     console.log(collapsed);
     this.setState({ collapsed });
   };
 
-  
-  render() {
-    const { collapsed } = this.state;
+  const handleChangeTab = (item) => {
+    setTab(item.key)
+   
+  }
+
     return <Layout style={{ minHeight: '100vh' }} className="dashboard-wrapper">
-    <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
+    <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
       <div className="logo">
         <img src="https://statics.pancake.vn/web-media/43/a8/25/3c/6698d516a44f85b6fbd72c8670499dd37d43fb44d5556d3304ffb868.png" />
       </div>
-      <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+      <Menu theme="dark" defaultSelectedKeys={['2']} mode="inline" onClick={handleChangeTab}>
         <Menu.Item key="1" icon={<AreaChartOutlined />}>
           Analytis
         </Menu.Item>
@@ -51,12 +50,15 @@ class Dashboard extends Component {
           <Breadcrumb.Item>Apps</Breadcrumb.Item>
         </Breadcrumb>
         <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-          <Apps></Apps>
+          { tab == "2" ?
+            <Apps></Apps>
+            : <Analytis></Analytis>
+          }
         </div>
       </Content>
-     <Footer style={{ textAlign: 'center' }}>By BinNeo</Footer>
+     
    </Layout>
  </Layout>
-  }
+  
 }
 export default Dashboard;

@@ -47,7 +47,10 @@ defmodule ProjectWeb.MixProject do
       {:poolboy, "~> 1.5"},
       {:bcrypt_elixir, "~> 2.2"},
       {:guardian, "~> 2.1.1"},
-      {:elixir_uuid, "~> 1.2"}
+      {:elixir_uuid, "~> 1.2"},
+      {:phoenix_ecto, "~> 3.2"},
+      {:browser, "~> 0.4.2"},
+      {:panex, "~> 0.1.0"},
     ]
   end
 

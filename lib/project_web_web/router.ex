@@ -2,6 +2,7 @@ defmodule ProjectWebWeb.Router do
   use ProjectWebWeb, :router
 
   alias ProjectWebWeb.Plug.AccountPlug
+  alias ProjectWebWeb.Plug.CollectPlug
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -19,9 +20,10 @@ defmodule ProjectWebWeb.Router do
     plug AccountPlug
   end
 
-  # pipeline :signup_layout do
-  #   plug :put_layout, {ProjectWebWeb.LayoutView, :sign_up}
-  # end
+  pipeline :collector do
+    plug(:accepts, ["image/gif"])
+    plug(CollectPlug)
+  end
 
   scope "/api", ProjectWebWeb do
     pipe_through :api
@@ -35,6 +37,8 @@ defmodule ProjectWebWeb.Router do
       pipe_through :account
       post "/create_app", PageController, :create_app
       get "/get_apps", PageController, :get_apps
+      post "/remove_app", PageController, :remove_app
+      get "/analytics", AnalyticsController, :get_analytics
     end
   end
 
@@ -49,6 +53,11 @@ defmodule ProjectWebWeb.Router do
     get "/dashboard", PageController, :single_page_app
     
 
+  end
+
+  scope "/", ProjectWebWeb do
+    pipe_through :collector
+    get "/collect", CollectorController, :collect
   end
 
   # Other scopes may use custom stacks.

@@ -30,5 +30,22 @@ export const getApps = params => {
     })
   }
 }
+export const removeApp = params => {
+  return dispatch => {
+    axios.post(`api/private/remove_app`, {id: params})
+    .then(res => {
+      if (res.status === 200 && res.data.success === true) {
+        dispatch({
+          type: "REMOVE_APP",
+          payload: params
+        })  
+      }
+      console.log(res, "okekekeekk")
+    })
+    .catch(err => {
+      console.log(err, "error remove app")
+    })
+  }
+}
 
 

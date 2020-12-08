@@ -100,7 +100,7 @@ defmodule ProjectWebWeb.PageController do
     |> IO.inspect(label: "insert success")
 
     
-    query_apps = "SELECT * FROM projecta.apps"
+    query_apps = "SELECT * FROM projecta.apps WHERE account_id=#{account_id} ALLOW FILTERING;"
     
     case CassandraClient.command(fn conn -> Xandra.execute(conn, query_apps) end) do
       {:ok, %Xandra.Page{} = res} -> 
@@ -133,5 +133,19 @@ defmodule ProjectWebWeb.PageController do
         |> json(%{success: false, message: "err query apps"})
 
     end
+  end
+
+  def remove_app(conn, %{"id" => id}=params) do
+    IO.inspect(id, label: "binneohihihs")
+    
+    delete = "DELETE FROM projecta.apps WHERE id='#{id}' IF EXISTS;"
+    case CassandraClient.command(fn conn -> Xandra.execute(conn, delete) end) do
+      {:ok, _} ->
+        json(conn, %{success: true, message: "Delete success"})
+    end
+  end
+
+  def collect(conn, params) do
+    IO.inspect(params, label: "paramss")
   end
 end

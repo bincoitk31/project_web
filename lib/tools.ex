@@ -33,4 +33,13 @@ defmodule ProjectWeb.Tools do
   defp random_char_from_alphabet() do
     Enum.random(@alphabet)
   end
+  def shift_to_vn_time(utc_datetime, time_diff \\ 25200) do
+    # time_diff = 25200
+    utc_sec =
+      NaiveDateTime.to_erl(utc_datetime)
+      |> :calendar.datetime_to_gregorian_seconds()
+
+    :calendar.gregorian_seconds_to_datetime(utc_sec + time_diff)
+    |> NaiveDateTime.from_erl!()
+  end
 end
