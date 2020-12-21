@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect, useRef, Component } from 'react';
 import { Table, Input, Button, Popconfirm, Modal } from 'antd';
 import { connect } from 'react-redux'
-import { createNewApp, getApps } from '../actions/appsAction'
+import { createNewApp, getApps, removeApp } from '../actions/appsAction'
 
 function Apps(props) {
-  const {apps, getApps, createNewApp} = props
+  const {apps, getApps, createNewApp, removeApp} = props
   console.log(props, "props")
     const columns = [
       {
@@ -35,7 +35,7 @@ function Apps(props) {
         dataIndex: 'operation',
         render: (text, record) =>
           apps.length >= 1 ? (
-            <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.key)}>
+            <Popconfirm title="Sure to delete?" onConfirm={() => removeApp(record.id)}>
               <a>Delete</a>
             </Popconfirm>
           ) : null,
@@ -65,15 +65,6 @@ function Apps(props) {
   
     const handleCancel = () => {
       setVisible(false)
-    };
-     
-  
-
-    const handleDelete = (key) => {
-      const dataSource = [...this.state.dataSource];
-      this.setState({
-        dataSource: dataSource.filter((item) => item.key !== key),
-      });
     };
  
   const handleSave = (row) => {
@@ -133,5 +124,6 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   createNewApp,
-  getApps
+  getApps, 
+  removeApp
 })(Apps)
