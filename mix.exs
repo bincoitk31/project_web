@@ -20,7 +20,7 @@ defmodule ProjectWeb.MixProject do
   def application do
     [
       mod: {ProjectWeb.Application, []},
-      extra_applications: [:logger, :runtime_tools, :xandra]
+      extra_applications: [:logger, :runtime_tools, :xandra, :timex]
     ]
   end
 
@@ -51,6 +51,7 @@ defmodule ProjectWeb.MixProject do
       {:phoenix_ecto, "~> 3.2"},
       {:browser, "~> 0.4.2"},
       {:panex, "~> 0.1.0"},
+      {:timex, "~> 3.1"},
     ]
   end
 

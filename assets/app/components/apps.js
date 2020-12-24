@@ -11,20 +11,24 @@ function Apps(props) {
         title: 'ID',
         dataIndex: 'id',
         width: '30px',
+        key: 'id'
       },
       {
         title: 'Name',
         dataIndex: 'name',
         editable: true,
+        key: 'name'
       },
       {
         title: 'Domain',
         dataIndex: 'domain',
         editable: true,
+        key: 'domain'
       },
       {
         title: 'Script',
         dataIndex: 'script',
+        key: 'script',
         render: (text, record) => 
           apps.length >= 1 ? (
             <a>Copy</a>
@@ -33,6 +37,7 @@ function Apps(props) {
       {
         title: 'Operation',
         dataIndex: 'operation',
+        key: 'operation',
         render: (text, record) =>
           apps.length >= 1 ? (
             <Popconfirm title="Sure to delete?" onConfirm={() => removeApp(record.id)}>
@@ -96,8 +101,9 @@ function Apps(props) {
       </Button>
       <Table
         bordered
-        dataSource={apps}
+        dataSource={apps.map(el => ({key: el.id, id: el.id, name: el.name, domain: el.domain, operation: el.remove}))}
         columns={columns}
+        
       />
       <Modal
           title="New app"
