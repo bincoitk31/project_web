@@ -11,6 +11,7 @@ const { RangePicker } = DatePicker;
 
 
 const Analytics = props => {
+  const { t } = props
   const [userOnline, setUserOnline] = useState(0)
   const [trafficConfig, setTrafficConfig] = useState({ series: [], options: {} })
   const [deviceConfig, setDeviceConfig] = useState({ series: [], options: {} })
@@ -18,17 +19,21 @@ const Analytics = props => {
   const [desktop, setDesktop] = useState(0)
   const [mobile, setMobile] = useState(0)
   const [tablet, setTablet] = useState(0) 
-
+  const [from, setFrom] = useState()
+  const [to, setTo] = useState()
+  const [appId, setAppId] = useState()
+  const [domain, setDomain] = useState()
+  const [pageViews, setPageViews] = useState([])
 
   const buildTrafic = (traffic, users) => {
     return {
       series: [
         {
-          name: "Traffic data",
+          name: t('analytics.traffic_data'),
           data: traffic.map(el => el.count)
         },
         {
-          name: "Users",
+          name: t('analytics.users'),
           data: users.map(el => el.count)
         }
       ],
@@ -141,7 +146,7 @@ const Analytics = props => {
           data: direct
         },
         {
-          name: "Khác",
+          name: t('analytics.other'),
           data: others
         }
       ],
@@ -202,13 +207,14 @@ const Analytics = props => {
           'Last month': [moment().subtract(1, 'months').startOf('month'), moment().subtract(1, 'months').endOf('month')]
         }}
         onChange={onChangeTime}
+        format="YYYY-MM-DD HH:mm:ss"
       />
     </Space>
     <div className="date-tag">
 
     </div>
     <div className="date-confirm">
-      <Button type="primary">Confirmed</Button> 
+      <Button type="primary" onClick={handleConfirmed}>{t('analytics.confirmed')}</Button> 
     </div>
   </div>
   )
@@ -219,7 +225,8 @@ const Analytics = props => {
       let tid = apps[0].id
       let domain =  apps[0].domain
       let period = "week"
-      
+      setAppId(tid)
+      setDomain(domain)
       axios.get(`api/private/analytics?tid=${tid}&domain=${domain}&period=${period}`)
       .then(res => {
         console.log(res, "get analytics oke ")
@@ -228,7 +235,9 @@ const Analytics = props => {
           setTrafficConfig(buildTrafic(res.data.request_count_by_day, res.data.unique_user_by_week))
           setDeviceConfig(buildDevice(res.data.devices))
           setChanelConfig(buildChannels(res.data.referrers) || [])
+          setPageViews(res.data.page_views_by_day)
         }
+        console.log(pageViews, "pageViews")
       })
     }
   }, [])
@@ -236,29 +245,69 @@ const Analytics = props => {
   const handleChangeApp = (value, opt) => {
     let tid = value
     let domain = opt.children
-    let spec =  "unique_user_online"
-    
-    
-    // axios.get(`api/private/analytics?tid=${tid}&domain=${domain}&spec=${spec}`)
-    // .then(res => {
-    //   if (res.status == 200) {
-    //     setUserOnline(res.data.unique_user_online)
-    //   }
-    //   console.log(res, "get analytics oke ")
-    // })
+    let period = "week"
+    setAppId(tid)
+    setDomain(domain)
+    axios.get(`api/private/analytics?tid=${tid}&domain=${domain}&period=${period}`)
+    .then(res => {
+      console.log(res, "get analytics oke ")
+      if (res.status == 200) {
+        setUserOnline(res.data.unique_user_online)
+        setTrafficConfig(buildTrafic(res.data.request_count_by_day, res.data.unique_user_by_week))
+        setDeviceConfig(buildDevice(res.data.devices))
+        setChanelConfig(buildChannels(res.data.referrers) || [])
+        setPageViews(res.data.page_views_by_day || [])
+      }
+    })
   }
     
-  const onChangeTime = (dates, dateStrings) => {
-    console.log('From: ', dates[0], ', to: ', dates[1]);
-    console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
+  function onChangeTime(dates, dateStrings) {
+    setFrom(dateStrings[0])
+    setTo(dateStrings[1])
   }
+
+  function handleConfirmed() {
+    console.log("from", from)
+    console.log("to", to)
+
+    let period = "date_range"
+    let date = {
+      "start_time" : from,
+      "end_time": to
+    }
+    let params = {
+      tid: appId,
+      domain: domain,
+      period: period,
+      date_range: date
+    }
+    console.log(date, "date")
+    axios.get('api/private/analytics', {params})
+    .then(res => {
+      console.log(res, "get analytics oke ")
+      if (res.status == 200) {
+        setUserOnline(res.data.unique_user_online)
+        setTrafficConfig(buildTrafic(res.data.request_count_by_day, res.data.unique_user_by_week))
+        setDeviceConfig(buildDevice(res.data.devices))
+        setChanelConfig(buildChannels(res.data.referrers) || [])
+        setPageViews(res.data.page_views_by_day || [])
+      }
+    })
+  }
+
+  const listPageViews = pageViews.map((el, idx) => 
+    <li key={idx} className="pageviews-path">
+      <div>{el[0]}</div>
+      <div>{el[1]}</div>
+    </li>
+  )
 
   return (
     <div>
       <Row>
         <Col span={12}>
           <div className="d-flex pd-10">
-            <div className="d-flex-center pdr-10 fz-16">Selected apps: </div>
+            <div className="d-flex-center pdr-10 fz-16">{t('analytics.selected_apps')}: </div>
             <Select defaultValue={props.apps.length > 0 ? props.apps[0].id : ""} style={{ width: 200 }} onChange={handleChangeApp}>
               { props.apps.map(el => {
                 return <Option key={el.id} value={el.id}>{el.name}</Option> 
@@ -276,9 +325,9 @@ const Analytics = props => {
       <Row>
         <Col span={16} className="pd-10">
           <div className="table-card">
-            <div className="card-title">Traffic
+            <div className="card-title">{t('analytics.traffic')}
             <span className="fz-14 fw-0 pdl-10">
-              <Badge status="processing" /> {userOnline} User online 
+              <Badge status="processing" /> {userOnline} {t('analytics.user_online')} 
             </span>
             </div>
             <Chart
@@ -291,13 +340,13 @@ const Analytics = props => {
         </Col>
         <Col span={8} className="pd-10">
           <div className="table-card">
-            <div className="card-title">Device</div>
+            <div className="card-title">{t('analytics.device')}</div>
             <Chart options={deviceConfig ?.options} series={deviceConfig ?.series} type="donut" width="100%" />
             <table className="wc-table">
               <thead className="wc-thead">
                 <tr>
-                  <th>Device</th>
-                  <th>Access count</th>
+                  <th>{t('analytics.device')}</th>
+                  <th>{t('analytics.access_count')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -321,7 +370,7 @@ const Analytics = props => {
       <Row>
         <Col span={12} className="pd-10">
           <div className="table-card">
-            <div className="card-title">Traffic by channel</div>
+            <div className="card-title">{t('analytics.trafic_by_channel')}</div>
             <Chart
               options={chanelConfig ?.options}
               series={chanelConfig ?.series}
@@ -332,8 +381,16 @@ const Analytics = props => {
         </Col>
         <Col span={12} className="pd-10">
           <div className="table-card">
-            <div className="card-title">Number of visited</div>
-            
+            <div className="card-title">{t('analytics.number_of_visited')}</div>
+            <div className="card-pageviews">
+              <ul className="pageviews">
+                <li className="thead">
+                  <div>{t('analytics.page')}</div>
+                  <div>{t('analytics.number_of_view_page')}</div>
+                </li>
+                {listPageViews}                
+              </ul>
+            </div>
           </div>
         </Col>
       </Row>

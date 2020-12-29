@@ -39,6 +39,9 @@ defmodule ProjectWebWeb.Router do
       get "/get_apps", PageController, :get_apps
       post "/remove_app", PageController, :remove_app
       get "/analytics", AnalyticsController, :get_analytics
+      get "/account", PageController, :get_account
+      post "/edit_profile", PageController, :edit_profile
+      post "/edit_password", PageController, :edit_password
     end
   end
 

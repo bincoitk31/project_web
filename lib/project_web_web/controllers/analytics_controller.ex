@@ -30,7 +30,7 @@ defmodule ProjectWebWeb.AnalyticsController do
 
   def get_analytics(conn, %{"tid" => tid, "domain" => domain, "period" => period} = params) do
     now = Date.utc_today()
-    IO.inspect(label: "khong co periode")
+    IO.inspect(params["date_range"], label: "vailon")
     # hour range in date
     hour_range =
       if !Tools.is_empty?(params["hour_range"]),
@@ -57,7 +57,7 @@ defmodule ProjectWebWeb.AnalyticsController do
       if !Tools.is_empty?(params["date_range"]),
         do: Jason.decode!(params["date_range"]),
         else: %{}
-
+    IO.inspect(date_range, label: "date_range")
     start_time =
       if !Tools.is_empty?(date_range["start_time"]),
         do: NaiveDateTime.from_iso8601!(date_range["start_time"]) |> NaiveDateTime.to_date(),
@@ -74,7 +74,7 @@ defmodule ProjectWebWeb.AnalyticsController do
         "date_range" -> end_time
         _ -> now
       end
-    |> IO.inspect(label: "now")
+    # |> IO.inspect(label: "now")
     peri =
       case period do
         "hour_range" -> start_hour
@@ -84,22 +84,23 @@ defmodule ProjectWebWeb.AnalyticsController do
         "month" -> Timex.shift(now, months: -1)
         _ -> now
       end
-    |> IO.inspect(label: "peri")
-    now = if is_integer(now), do: now, else: Date.to_string(now)
+    # |> IO.inspect(label: "peri")
+    now = if is_integer(now), do: now, else: Date.to_string(now) 
     peri = if is_integer(peri), do: peri, else: Date.to_string(peri)
+    IO.inspect(now, label: "now")
+    IO.inspect(peri, label: "peri")
+    page_view_query =
+      case period do
+        "hour_range" ->
+          "SELECT * FROM projecta.count_page_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
+            now
+          } and day = '#{date_hour}' ALLOW FILTERING;"
 
-    # page_view_query =
-    #   case period do
-    #     "hour_range" ->
-    #       "SELECT * FROM projecta.count_page_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
-    #         now
-    #       } and day = '#{date_hour}' ALLOW FILTERING;"
-
-    #     _ ->
-    #       "SELECT * FROM projecta.count_by_pages WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
-    #         now
-    #       }';"
-    #   end
+        _ ->
+          "SELECT * FROM projecta.count_by_pages WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
+            now
+          }';"
+      end
 
     browser_query =
       case period do
@@ -176,8 +177,7 @@ defmodule ProjectWebWeb.AnalyticsController do
                 date_hour
               }' ALLOW FILTERING;"
 
-            case CassandraClient.command(fn conn -> Xandra.execute(conn, q) end)
-                 |> IO.inspect(label: "iiiiiiiiiiiii") do
+            case CassandraClient.command(fn conn -> Xandra.execute(conn, q) end) do
               {:ok, %Xandra.Page{} = res} ->
                 [count] = Enum.to_list(res)
                 Map.put(count, "date", "#{d + 7}:00")
@@ -290,7 +290,7 @@ defmodule ProjectWebWeb.AnalyticsController do
       end)
       |> Enum.reject(&(&1 == nil))
       |> Enum.reverse()
-      |> IO.inspect(label: "count by week")
+      
 
     req_count_by_date_range =
       case CassandraClient.command(fn conn -> Xandra.execute(conn, req_count_by_day) end) do
@@ -345,36 +345,33 @@ defmodule ProjectWebWeb.AnalyticsController do
         max_date_online
       }' ALLOW FILTERING"
 
-    with {:ok, %Xandra.Page{} = devices} <-
-           CassandraClient.command(fn conn -> Xandra.execute(conn, browser_query) end)
-           |> IO.inspect(label: "devices"),
+    with {:ok, %Xandra.Page{} = pvbd} <-
+        CassandraClient.command(fn conn -> Xandra.execute(conn, page_view_query) end),
+        {:ok, %Xandra.Page{} = devices} <-
+           CassandraClient.command(fn conn -> Xandra.execute(conn, browser_query) end),
          {:ok, %Xandra.Page{} = ubd} <-
            CassandraClient.command(fn conn ->
-             Xandra.execute(conn, unique_by_day) |> IO.inspect(label: "ubd")
-           end),
+             Xandra.execute(conn, unique_by_day) end),
          {:ok, %Xandra.Page{} = ubw} <-
            CassandraClient.command(fn conn ->
-             Xandra.execute(conn, unique_by_week) |> IO.inspect(label: "ubw")
-           end),
+             Xandra.execute(conn, unique_by_week) end),
          {:ok, %Xandra.Page{} = req_count_by_day} <-
            CassandraClient.command(fn conn ->
-             Xandra.execute(conn, req_count_by_day) |> IO.inspect(label: "cbd")
-           end),
+             Xandra.execute(conn, req_count_by_day) end),
          {:ok, %Xandra.Page{} = referrers} <-
            CassandraClient.command(fn conn ->
-             Xandra.execute(conn, referrer_query) |> IO.inspect(label: "ref")
-           end),
+             Xandra.execute(conn, referrer_query) end),
          {:ok, %Xandra.Page{} = unique_user_online} <-
            CassandraClient.command(fn conn ->
              Xandra.execute(conn, query_unique_user_online)
            end) do
-      # pv =
-      #   Enum.to_list(pvbd)
-      #   |> distinct_count("path", %{})
-      #   |> Map.to_list()
-      #   |> Enum.sort(fn {_, p}, {_, n} -> n <= p end)
-      #   |> Enum.slice(0..9)
-      #   |> Enum.map(fn {k, v} -> [k, v] end)
+      pv =
+        Enum.to_list(pvbd)
+        |> distinct_count("path", %{})
+        |> Map.to_list()
+        |> Enum.sort(fn {_, p}, {_, n} -> n <= p end)
+        |> Enum.slice(0..9)
+        |> Enum.map(fn {k, v} -> [k, v] end)
 
       devices_count =
         Enum.to_list(devices)
@@ -406,9 +403,13 @@ defmodule ProjectWebWeb.AnalyticsController do
         |> Enum.map(fn el ->
           Timex.shift(Date.utc_today(), days: -1 * el) |> Date.to_string()
         end)
+      
+      days = if period == "week", do: week_days, else: Enum.map(refs, fn el -> Date.to_string(el["day"]) end)  
+      
+      IO.inspect(days, label: "dayss")
 
       referrers =
-        week_days
+        days
         |> Enum.sort(fn p, n -> p <= n end)
         |> Enum.map(fn el ->
           data = %{
@@ -471,7 +472,7 @@ defmodule ProjectWebWeb.AnalyticsController do
 
       json(conn, %{
         success: true,
-        # page_views_by_day: pv,
+        page_views_by_day: pv,
         devices: devices_count,
         unique_user_by_week: date_range_query,
         unique_user_by_day: ubd,

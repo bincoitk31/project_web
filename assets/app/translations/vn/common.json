@@ -1,0 +1,36 @@
+{
+  "dashboard": {
+    "apps": "Ứng dụng",
+    "analytics": "Đồ thị",
+    "hello": "Xin chào",
+    "profile": "Thông tin cá nhân"
+  },
+  "profile": {
+    "last_name": "Họ và tên đệm",
+    "first_name": "Tên",
+    "email": "Email",
+    "phone_number": "Số điện thoại",
+    "save": "Lưu",
+    "edit_profile": "Chỉnh sửa thông tin",
+    "reset_pass": "Thay đổi mật khẩu",
+    "new_pass": "Mật khẩu mới",
+    "confirm_pass": "Nhập lại mật khẩu"
+  },
+  "analytics": {
+    "page": "Trang",
+    "number_of_view_page": "Số lượt xem trang",
+    "number_of_visited": "Thống kê truy cập theo trang",
+    "trafic_by_channel": "Lượng truy cập theo kênh",
+    "device": "Thiết bị",
+    "access_count": "Số lượng",
+    "traffic": "Lượng truy cập",
+    "user_online": "Người đang online",
+    "traffic_data": "Lượt truy cập",
+    "users": "Người dùng",
+    "confirmed": "Xác nhận",
+    "selected_apps": "Chọn ứng dụng",
+    "other": "Khác"
+
+
+  }
+}

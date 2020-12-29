@@ -122,4 +122,24 @@ CREATE TABLE unique_user_online (
   PRIMARY KEY((date), tid, domain, user_id)
 );
  ALTER TABLE count_device_by_hour ADD tablet_count counter;
+
  ALTER TABLE count_by_device ADD tablet_count counter;
+
+CREATE TABLE count_page_by_hour (
+  domain text,
+  day date,
+  hour int,
+  path text,
+  tid text,
+  count counter,
+  PRIMARY KEY (tid, day, domain, path, hour)
+);
+
+CREATE TABLE count_by_pages (
+  domain text,
+  day date,
+  path text,
+  tid text,
+  count counter,
+  PRIMARY KEY (tid, day, domain, path)
+); 
