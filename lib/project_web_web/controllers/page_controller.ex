@@ -148,4 +148,49 @@ defmodule ProjectWebWeb.PageController do
   def collect(conn, params) do
     IO.inspect(params, label: "paramss")
   end
+
+  def get_account(conn, _) do
+    account_id = conn.assigns.id_user
+    query = "SELECT * FROM projecta.accounts WHERE id=#{account_id} ALLOW FILTERING;"
+    
+    case CassandraClient.command(fn conn -> Xandra.execute(conn, query) end) do
+      {:ok, %Xandra.Page{} = res} -> 
+        account = Enum.to_list(res)
+        json(conn, %{success: true, account: account})
+
+      {:err, _} ->
+        conn
+        |> put_status(422)
+        |> json(%{success: false, message: "err query account"})
+    end
+  end
+
+  def edit_profile(conn, params) do
+    account_id = conn.assigns.id_user
+    first_name = params["firstname"]
+    last_name = params["lastname"]
+    phone_number = params["phone_number"]
+    email = params["email"]
+
+    edit = "UPDATE projecta.accounts SET last_name='#{last_name}', first_name='#{first_name}', phone_number='#{phone_number}' WHERE id=#{account_id} AND email ='#{email}';" 
+    
+    case CassandraClient.command(fn conn -> Xandra.execute(conn, edit) end) do
+      {:ok, _} ->
+        json(conn, %{success: true, message: "Edit success"})
+    end
+  end
+
+  def edit_password(conn, params) do
+    IO.inspect(params, label: "pasramsmmmmmmmmmm")
+    account_id = conn.assigns.id_user
+    password = Bcrypt.hash_pwd_salt(params["password"])
+    email = params["email"]
+
+    edit = "UPDATE projecta.accounts SET password='#{password}' WHERE id=#{account_id} AND email ='#{email}';"
+    case CassandraClient.command(fn conn -> Xandra.execute(conn, edit) end) do
+      {:ok, _} ->
+        json(conn, %{success: true, message: "Edit password success"})
+    end
+  end
+
 end

@@ -5,12 +5,10 @@ defmodule ProjectWebWeb.AnalyticsController do
   alias ProjectWeb.Tools
   import Plug.Conn
 
-  def get_analytics(
-        conn,
-        params
-      ) do
-        tid = params[["tid"]]
+  def get_analytics(conn,%{"tid" => tid, "domain" => domain, "spec" => "unique_user_online"} = params) do
+    IO.inspect(params, label: "params")
     date_now = DateTime.utc_now() |> DateTime.to_unix(:millisecond)
+    IO.inspect(date_now, label: "date_now")
     max_date_online = date_now - 5 * 60 * 1000
         IO.inspect(max_date_online,label: "Oke ban nhe")
     query_unique_user_online =
@@ -23,15 +21,16 @@ defmodule ProjectWebWeb.AnalyticsController do
              Xandra.execute(conn, query_unique_user_online)
            end) do
       [unique_user_online] = Enum.to_list(unique_user_online)
+      IO.inspect(unique_user_online ,label: "onl")
       count_user_online = unique_user_online["count"] || 0
 
       json(conn, %{unique_user_online: count_user_online})
     end
   end
 
-  def get_analyticss(conn, %{"tid" => tid, "domain" => domain, "period" => period} = params) do
+  def get_analytics(conn, %{"tid" => tid, "domain" => domain, "period" => period} = params) do
     now = Date.utc_today()
-    IO.inspect(label: "dkmmm")
+    IO.inspect(params["date_range"], label: "vailon")
     # hour range in date
     hour_range =
       if !Tools.is_empty?(params["hour_range"]),
@@ -42,7 +41,7 @@ defmodule ProjectWebWeb.AnalyticsController do
       if !Tools.is_empty?(hour_range["date_hour"]),
         do: NaiveDateTime.from_iso8601!(hour_range["date_hour"]) |> NaiveDateTime.to_date(),
         else: now
-
+    
     start_hour =
       if !Tools.is_empty?(hour_range["start_hour"]),
         do: hour_range["start_hour"],
@@ -58,24 +57,24 @@ defmodule ProjectWebWeb.AnalyticsController do
       if !Tools.is_empty?(params["date_range"]),
         do: Jason.decode!(params["date_range"]),
         else: %{}
-
+    IO.inspect(date_range, label: "date_range")
     start_time =
       if !Tools.is_empty?(date_range["start_time"]),
         do: NaiveDateTime.from_iso8601!(date_range["start_time"]) |> NaiveDateTime.to_date(),
         else: now
-
+    
     end_time =
       if !Tools.is_empty?(date_range["end_time"]),
         do: NaiveDateTime.from_iso8601!(date_range["end_time"]) |> NaiveDateTime.to_date(),
         else: now
-
+    
     now =
       case period do
         "hour_range" -> end_hour
         "date_range" -> end_time
         _ -> now
       end
-
+    # |> IO.inspect(label: "now")
     peri =
       case period do
         "hour_range" -> start_hour
@@ -83,21 +82,22 @@ defmodule ProjectWebWeb.AnalyticsController do
         "day" -> now
         "week" -> Timex.shift(now, days: -6)
         "month" -> Timex.shift(now, months: -1)
-        _ -> Date.to_string(now)
+        _ -> now
       end
-
-    now = if is_integer(now), do: now, else: Date.to_string(now)
+    # |> IO.inspect(label: "peri")
+    now = if is_integer(now), do: now, else: Date.to_string(now) 
     peri = if is_integer(peri), do: peri, else: Date.to_string(peri)
-
+    IO.inspect(now, label: "now")
+    IO.inspect(peri, label: "peri")
     page_view_query =
       case period do
         "hour_range" ->
-          "SELECT * FROM stats.count_page_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
+          "SELECT * FROM projecta.count_page_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
             now
           } and day = '#{date_hour}' ALLOW FILTERING;"
 
         _ ->
-          "SELECT * FROM stats.count_by_pages WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
+          "SELECT * FROM projecta.count_by_pages WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
             now
           }';"
       end
@@ -105,12 +105,12 @@ defmodule ProjectWebWeb.AnalyticsController do
     browser_query =
       case period do
         "hour_range" ->
-          "SELECT * FROM stats.count_device_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
+          "SELECT * FROM projecta.count_device_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
             now
           } AND day = '#{date_hour}' ALLOW FILTERING;"
 
         _ ->
-          "SELECT * FROM stats.count_by_device WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
+          "SELECT * FROM projecta.count_by_device WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
             now
           }';"
       end
@@ -118,12 +118,12 @@ defmodule ProjectWebWeb.AnalyticsController do
     unique_by_day =
       case period do
         "hour_range" ->
-          "SELECT COUNT(*) FROM stats.unique_user_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
+          "SELECT COUNT(*) FROM projecta.unique_user_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
             now
           } AND day = '#{date_hour}' ALLOW FILTERING;"
 
         _ ->
-          "SELECT COUNT(*) FROM stats.unique_user_by_day WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
+          "SELECT COUNT(*) FROM projecta.unique_user_by_day WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
             now
           }';"
       end
@@ -131,12 +131,12 @@ defmodule ProjectWebWeb.AnalyticsController do
     unique_by_week =
       case period do
         "hour_range" ->
-          "SELECT * FROM stats.unique_user_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
+          "SELECT * FROM projecta.unique_user_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
             now
           } AND day = '#{date_hour}' ALLOW FILTERING;"
 
         _ ->
-          "SELECT * FROM stats.unique_user_by_day WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
+          "SELECT * FROM projecta.unique_user_by_day WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
             now
           }';"
       end
@@ -144,12 +144,12 @@ defmodule ProjectWebWeb.AnalyticsController do
     req_count_by_day =
       case period do
         "hour_range" ->
-          "SELECT * FROM stats.request_count_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
+          "SELECT * FROM projecta.request_count_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
             now
           } AND day = '#{date_hour}' ALLOW FILTERING;"
 
         _ ->
-          "SELECT * FROM stats.request_count_by_day WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
+          "SELECT * FROM projecta.request_count_by_day WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
             now
           }';"
       end
@@ -157,12 +157,12 @@ defmodule ProjectWebWeb.AnalyticsController do
     referrer_query =
       case period do
         "hour_range" ->
-          "SELECT * FROM stats.count_referrer_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
+          "SELECT * FROM projecta.count_referrer_by_hour WHERE tid = '#{tid}' AND hour >= #{peri} AND hour <= #{
             now
           } AND day = '#{date_hour}' ALLOW FILTERING;"
 
         _ ->
-          "SELECT * FROM stats.count_by_referrer WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
+          "SELECT * FROM projecta.count_by_referrer WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
             now
           }';"
       end
@@ -173,12 +173,11 @@ defmodule ProjectWebWeb.AnalyticsController do
           Enum.to_list((start_hour - 7)..(end_hour - 7))
           |> Enum.map(fn d ->
             q =
-              "SELECT COUNT(*) FROM stats.unique_user_by_hour WHERE tid = '#{tid}' AND hour = #{d} AND day = '#{
+              "SELECT COUNT(*) FROM projecta.unique_user_by_hour WHERE tid = '#{tid}' AND hour = #{d} AND day = '#{
                 date_hour
               }' ALLOW FILTERING;"
 
-            case CassandraClient.command(fn conn -> Xandra.execute(conn, q) end)
-                 |> IO.inspect(label: "iiiiiiiiiiiii") do
+            case CassandraClient.command(fn conn -> Xandra.execute(conn, q) end) do
               {:ok, %Xandra.Page{} = res} ->
                 [count] = Enum.to_list(res)
                 Map.put(count, "date", "#{d + 7}:00")
@@ -191,7 +190,7 @@ defmodule ProjectWebWeb.AnalyticsController do
 
         "date_range" ->
           q =
-            "SELECT * FROM stats.unique_user_by_day WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
+            "SELECT * FROM projecta.unique_user_by_day WHERE tid = '#{tid}' AND day >= '#{peri}' AND day <= '#{
               now
             }'"
 
@@ -224,7 +223,7 @@ defmodule ProjectWebWeb.AnalyticsController do
               |> Date.to_string()
 
             q =
-              "SELECT COUNT(*) FROM stats.unique_user_by_day WHERE tid = '#{tid}' AND day = '#{d}'"
+              "SELECT COUNT(*) FROM projecta.unique_user_by_day WHERE tid = '#{tid}' AND day = '#{d}'"
 
             case CassandraClient.command(fn conn -> Xandra.execute(conn, q) end) do
               {:ok, %Xandra.Page{} = res} ->
@@ -248,7 +247,7 @@ defmodule ProjectWebWeb.AnalyticsController do
               |> Date.to_string()
 
             q =
-              "SELECT COUNT(*) FROM stats.unique_user_by_day WHERE tid = '#{tid}' AND day = '#{d}'"
+              "SELECT COUNT(*) FROM projecta.unique_user_by_day WHERE tid = '#{tid}' AND day = '#{d}'"
 
             case CassandraClient.command(fn conn -> Xandra.execute(conn, q) end) do
               {:ok, %Xandra.Page{} = res} ->
@@ -263,6 +262,8 @@ defmodule ProjectWebWeb.AnalyticsController do
           end)
           |> Enum.reject(&(&1 == nil))
           |> Enum.reverse()
+        
+        _ -> IO.inspect(label: "haha")
       end
 
     req_count_by_week =
@@ -274,7 +275,7 @@ defmodule ProjectWebWeb.AnalyticsController do
           |> Date.to_string()
 
         q =
-          "SELECT SUM(count) as count FROM stats.request_count_by_day WHERE tid = '#{tid}' AND day = '#{
+          "SELECT SUM(count) as count FROM projecta.request_count_by_day WHERE tid = '#{tid}' AND day = '#{
             d
           }' order by day DESC;"
 
@@ -289,7 +290,7 @@ defmodule ProjectWebWeb.AnalyticsController do
       end)
       |> Enum.reject(&(&1 == nil))
       |> Enum.reverse()
-      |> IO.inspect(label: "count by week")
+      
 
     req_count_by_date_range =
       case CassandraClient.command(fn conn -> Xandra.execute(conn, req_count_by_day) end) do
@@ -314,7 +315,7 @@ defmodule ProjectWebWeb.AnalyticsController do
       Enum.to_list((start_hour - 7)..(end_hour - 7))
       |> Enum.map(fn d ->
         q =
-          "SELECT SUM(count) AS count FROM stats.request_count_by_hour WHERE tid = '#{tid}' AND hour = #{
+          "SELECT SUM(count) AS count FROM projecta.request_count_by_hour WHERE tid = '#{tid}' AND hour = #{
             d
           } AND day = '#{date_hour}' ALLOW FILTERING;"
 
@@ -328,7 +329,7 @@ defmodule ProjectWebWeb.AnalyticsController do
 
     # YOU CAN GET RESULT in just ONE SINGLE READ QUERY WITH GROUP BY
     #     uubw_query =
-    #       "SELECT day, domain, COUNT(*) as count FROM stats.unique_user_by_day WHERE day >= '#{week}' AND day <= '#{
+    #       "SELECT day, domain, COUNT(*) as count FROM projecta.unique_user_by_day WHERE day >= '#{week}' AND day <= '#{
     #         now
     #       }' GROUP BY day, domain ALLOW FILTERING;"
     #
@@ -340,32 +341,26 @@ defmodule ProjectWebWeb.AnalyticsController do
     max_date_online = date_now - 5 * 60 * 1000
 
     query_unique_user_online =
-      "SELECT COUNT(*) FROM stats.unique_user_online WHERE tid = '#{tid}' and timestamp >= '#{
+      "SELECT COUNT(*) FROM projecta.unique_user_online WHERE tid = '#{tid}' and timestamp >= '#{
         max_date_online
       }' ALLOW FILTERING"
 
     with {:ok, %Xandra.Page{} = pvbd} <-
-           CassandraClient.command(fn conn -> Xandra.execute(conn, page_view_query) end)
-           |> IO.inspect(label: "pvbd"),
-         {:ok, %Xandra.Page{} = devices} <-
-           CassandraClient.command(fn conn -> Xandra.execute(conn, browser_query) end)
-           |> IO.inspect(label: "devices"),
+        CassandraClient.command(fn conn -> Xandra.execute(conn, page_view_query) end),
+        {:ok, %Xandra.Page{} = devices} <-
+           CassandraClient.command(fn conn -> Xandra.execute(conn, browser_query) end),
          {:ok, %Xandra.Page{} = ubd} <-
            CassandraClient.command(fn conn ->
-             Xandra.execute(conn, unique_by_day) |> IO.inspect(label: "ubd")
-           end),
+             Xandra.execute(conn, unique_by_day) end),
          {:ok, %Xandra.Page{} = ubw} <-
            CassandraClient.command(fn conn ->
-             Xandra.execute(conn, unique_by_week) |> IO.inspect(label: "ubw")
-           end),
+             Xandra.execute(conn, unique_by_week) end),
          {:ok, %Xandra.Page{} = req_count_by_day} <-
            CassandraClient.command(fn conn ->
-             Xandra.execute(conn, req_count_by_day) |> IO.inspect(label: "cbd")
-           end),
+             Xandra.execute(conn, req_count_by_day) end),
          {:ok, %Xandra.Page{} = referrers} <-
            CassandraClient.command(fn conn ->
-             Xandra.execute(conn, referrer_query) |> IO.inspect(label: "ref")
-           end),
+             Xandra.execute(conn, referrer_query) end),
          {:ok, %Xandra.Page{} = unique_user_online} <-
            CassandraClient.command(fn conn ->
              Xandra.execute(conn, query_unique_user_online)
@@ -408,9 +403,13 @@ defmodule ProjectWebWeb.AnalyticsController do
         |> Enum.map(fn el ->
           Timex.shift(Date.utc_today(), days: -1 * el) |> Date.to_string()
         end)
+      
+      days = if period == "week", do: week_days, else: Enum.map(refs, fn el -> Date.to_string(el["day"]) end)  
+      
+      IO.inspect(days, label: "dayss")
 
       referrers =
-        week_days
+        days
         |> Enum.sort(fn p, n -> p <= n end)
         |> Enum.map(fn el ->
           data = %{

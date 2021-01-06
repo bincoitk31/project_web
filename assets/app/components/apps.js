@@ -4,39 +4,44 @@ import { connect } from 'react-redux'
 import { createNewApp, getApps, removeApp } from '../actions/appsAction'
 
 function Apps(props) {
-  const {apps, getApps, createNewApp, removeApp} = props
-  console.log(props, "props")
+  const {apps, getApps, createNewApp, removeApp, t} = props
+  
     const columns = [
       {
         title: 'ID',
         dataIndex: 'id',
         width: '30px',
+        key: 'id'
       },
       {
-        title: 'Name',
+        title: t('apps.name'),
         dataIndex: 'name',
         editable: true,
+        key: 'name'
       },
       {
-        title: 'Domain',
+        title: t('apps.domain'),
         dataIndex: 'domain',
         editable: true,
+        key: 'domain'
       },
       {
-        title: 'Script',
+        title: t('apps.script'),
         dataIndex: 'script',
+        key: 'script',
         render: (text, record) => 
           apps.length >= 1 ? (
             <a>Copy</a>
           ) : null
       },
       {
-        title: 'Operation',
+        title: t('apps.action'),
         dataIndex: 'operation',
+        key: 'operation',
         render: (text, record) =>
           apps.length >= 1 ? (
-            <Popconfirm title="Sure to delete?" onConfirm={() => removeApp(record.id)}>
-              <a>Delete</a>
+            <Popconfirm title={t('apps.sure_to_delete?')} onConfirm={() => removeApp(record.id)}>
+              <a>{t('apps.delete')}</a>
             </Popconfirm>
           ) : null,
       },
@@ -92,23 +97,24 @@ function Apps(props) {
           marginBottom: 16,
         }}
       >
-        Add a app
+        {t('apps.add_a_script')}
       </Button>
       <Table
         bordered
-        dataSource={apps}
+        dataSource={apps.map(el => ({key: el.id, id: el.id, name: el.name, domain: el.domain, operation: el.remove}))}
         columns={columns}
+        
       />
       <Modal
-          title="New app"
+          title={t('apps.new_script')}
           visible={visible}
           onOk={handleOk}
           onCancel={handleCancel}
       >
-        <label>Name app</label>
+        <label>{t('apps.name_script')}</label>
         <Input placeholder="webcake" onChange={ e => setName(e.target.value)}/>
         <div style={{padding: '5px 0'}}></div>
-        <label>Domain</label>
+        <label>{t('apps.domain')}</label>
         <Input placeholder="webcake.com" onChange={ e=> setDomain(e.target.value)}/>
       </Modal>
     </div>

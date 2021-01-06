@@ -119,8 +119,8 @@ defmodule ProjectWebWeb.CollectorController do
 
       {domain, path} = get_domain(stats["dl"], stats["sc"])
 
-      # inst =
-      #   "UPDATE projecta.count_by_pages SET count = count + 1 WHERE path = ? AND domain = ? AND tid = ? AND day = ?"
+      inst =
+        "UPDATE projecta.count_by_pages SET count = count + 1 WHERE path = ? AND domain = ? AND tid = ? AND day = ?"
 
       [_date, min] =
         DateTime.utc_now()
@@ -143,13 +143,13 @@ defmodule ProjectWebWeb.CollectorController do
           browser
         end
 
-      # CassandraClient.execute(inst, [
-      #   {"text", path},
-      #   {"text", domain},
-      #   {"text", stats["tid"]},
-      #   {"date", date}
-      # ])
-      # |> IO.inspect()
+      CassandraClient.execute(inst, [
+        {"text", path},
+        {"text", domain},
+        {"text", stats["tid"]},
+        {"date", date}
+      ])
+      |> IO.inspect()
 
       dinst =
         "UPDATE projecta.count_by_device SET #{browser}_count = #{browser}_count +1 WHERE domain = ? AND tid = ? AND day = ?"
