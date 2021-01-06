@@ -30,7 +30,16 @@
     "confirmed": "Xác nhận",
     "selected_apps": "Chọn ứng dụng",
     "other": "Khác"
-
-
+  },
+  "apps": {
+    "name": "Tên",
+    "script": "Mã kịch bản",
+    "domain": "Tên miền",
+    "action": "Hành động",
+    "delete": "Xóa",
+    "add_a_script": "Thêm một mã kịch bản",
+    "name_script": "Tên mã kịch bản",
+    "new_script": "Mã kịch bản mới",
+    "sure_to_delete?": "Bạn chắc chắn muố xóa ?"
   }
 }

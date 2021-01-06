@@ -19,5 +19,16 @@
   "analytics": {
     "page": "Page",
     "number_of_view_page": "Number of view page"
+  },
+  "apps": {
+    "name": "Name",
+    "script": "Script",
+    "domain": "Domain",
+    "action": "Action",
+    "delete": "Delete",
+    "add_a_script": "Add a script",
+    "name_script": "Name script",
+    "new_script": "New script",
+    "sure_to_delete?": "Sure to delete ?"
   }
 }

@@ -66,7 +66,7 @@ function Login() {
     <Row className="wrap-login" justify={"center"}>
       <Col className="login" span={6}>
         <div className="login-logo">
-          <img src="https://statics.pancake.vn/web-media/43/a8/25/3c/6698d516a44f85b6fbd72c8670499dd37d43fb44d5556d3304ffb868.png" />
+          <img src="https://statics.pancake.vn/web-media/58/ae/76/bc/f2f2716dc155a6c0a0602e3eb98c012692b0c374de1450f11d070d16.png" />
           </div>
         <div className="login-title">
           Welcome
