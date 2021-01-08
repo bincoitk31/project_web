@@ -31,7 +31,7 @@ function Apps(props) {
         key: 'script',
         render: (text, record) => 
           apps.length >= 1 ? (
-            <a>Copy</a>
+            <a onClick={copyScript(record.id)} >Copy</a>
           ) : null
       },
       {
@@ -57,14 +57,25 @@ function Apps(props) {
     const showModal = () => {
       setVisible(true)
     };
-  
+    
+    const copyScript = (id) => {
+      let script = `
+      <script>
+      !function(e,t){let a=t.createElement("script");a.async=!0,a.src="https://statistics.freelp.xyz/js/main.js";
+          let n=t.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n),e.wa=function(){(wa.q=wa.q||[]).push(arguments)}}(window,document);
+          wa('init', "${id}");
+     </script>
+      `
+      navigator.clipboard.writeText(script)
+      
+    }
+
     const handleOk = () => {
       let params = {
         name: name,
         domain: domain
       }
       createNewApp(params)
-      console.log(params, "paramss")
       setVisible(false)
     };
   
@@ -83,7 +94,6 @@ function Apps(props) {
   };
 
   useEffect(() => {
-    console.log(apps, "data")
     getApps()
   }, [])
 

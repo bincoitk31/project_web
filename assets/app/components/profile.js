@@ -4,7 +4,6 @@ import { Input, Button, Row, Col } from 'antd'
 import axios from 'axios';
 
 const Profile = props => {
-  console.log(props, "profileee")
   const {t, account} = props
   const [first, setFirst] = useState(account.first_name || "")
   const [lastname, setLastname] = useState(account.last_name || "")
@@ -40,7 +39,6 @@ const Profile = props => {
 
     axios.post('api/private/edit_profile', params)
     .then(res => {
-      console.log(res, "oke edit")
     })
   }
 
@@ -66,11 +64,11 @@ const Profile = props => {
 
       axios.post('api/private/edit_password', params)
       .then(res => {
-        console.log(res, "oke password edit")
+        
       })
 
     } else {
-      console.log("2 pass k trung nhau")
+      
     }
   }
 

@@ -66,7 +66,6 @@ function Signup() {
   }
 
   const redirectTO = (val) => {
-    console.log("vl")
     history.push(val)
   }
 

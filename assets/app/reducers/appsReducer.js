@@ -22,7 +22,6 @@ export default (state = initState, action) => {
 
       case "REMOVE_APP": {
         let idx = findIndex(state.apps, el => el.id == action.payload)
-        console.log(idx,"idx")
         return update(state, {
           apps: {$splice: [[idx, 1]] }
         })
