@@ -11,10 +11,10 @@ window.PancakeAnalytics = (function() {
 		"tags": ["es2015"]
 	}
 
-	var pa = {}
+	var wa = {}
 
   var init = function(tid) {
-		pa.tracking_id = tid
+		wa.tracking_id = tid
     Behavior.visit()
 	}
 
@@ -74,7 +74,7 @@ window.PancakeAnalytics = (function() {
 			xhttp.send()
 		},
 		createRequestViaImg: function(query) {
-      let host = NODE_ENV === "production" ? "https://analytics.pancake.vn" : "http://localhost:1998"
+      let host = NODE_ENV === "production" ? "https://statistics.freelp.xyz/" : "http://localhost:1998"
 			var img = document.createElement('img')	
 			img.width = "1"
 			img.height = "1"
@@ -102,7 +102,7 @@ window.PancakeAnalytics = (function() {
 				"&sr=" + encodeURIComponent(window.screen.width + "x" + window.screen.height) +
 				"&vp=" + encodeURIComponent(document.documentElement.clientWidth + "x" + document.documentElement.clientHeight) +
 				"&dt=" + encodeURIComponent(document.title) +
-				"&tid=" + encodeURIComponent(pa.tracking_id) +
+				"&tid=" + encodeURIComponent(wa.tracking_id) +
 				"&dh=" + encodeURIComponent(window.location.hostname) +
 				"&ts=" + Date.now() +
         "&_v=" + metadata.version +
@@ -117,7 +117,7 @@ window.PancakeAnalytics = (function() {
 
 	var interative = {
 		test: function() {
-        console.log(pa.tracking_id)
+        console.log(wa.tracking_id)
         console.log(Tools.getCookie("_pid"))
         console.log(Tools.getCookie("_pa"))
         console.log(Tools.request("GET", "/error", null, function(result) {

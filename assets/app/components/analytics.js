@@ -229,7 +229,6 @@ const Analytics = props => {
       setDomain(domain)
       axios.get(`api/private/analytics?tid=${tid}&domain=${domain}&period=${period}`)
       .then(res => {
-        console.log(res, "get analytics oke ")
         if (res.status == 200) {
           setUserOnline(res.data.unique_user_online)
           setTrafficConfig(buildTrafic(res.data.request_count_by_day, res.data.unique_user_by_week))
@@ -237,7 +236,6 @@ const Analytics = props => {
           setChanelConfig(buildChannels(res.data.referrers) || [])
           setPageViews(res.data.page_views_by_day)
         }
-        console.log(pageViews, "pageViews")
       })
     }
   }, [])
@@ -250,7 +248,6 @@ const Analytics = props => {
     setDomain(domain)
     axios.get(`api/private/analytics?tid=${tid}&domain=${domain}&period=${period}`)
     .then(res => {
-      console.log(res, "get analytics oke ")
       if (res.status == 200) {
         setUserOnline(res.data.unique_user_online)
         setTrafficConfig(buildTrafic(res.data.request_count_by_day, res.data.unique_user_by_week))
@@ -267,9 +264,6 @@ const Analytics = props => {
   }
 
   function handleConfirmed() {
-    console.log("from", from)
-    console.log("to", to)
-
     let period = "date_range"
     let date = {
       "start_time" : from,
@@ -281,10 +275,8 @@ const Analytics = props => {
       period: period,
       date_range: date
     }
-    console.log(date, "date")
     axios.get('api/private/analytics', {params})
     .then(res => {
-      console.log(res, "get analytics oke ")
       if (res.status == 200) {
         setUserOnline(res.data.unique_user_online)
         setTrafficConfig(buildTrafic(res.data.request_count_by_day, res.data.unique_user_by_week))

@@ -27,7 +27,6 @@ function Login() {
 
     axios.post(`/api/public/login`, params )
     .then(res => {
-      console.log(res, "resssssss")
       if (res.status == 200 && res.data.success == true) {
         window.location.href = window.origin + "/dashboard"
       }
