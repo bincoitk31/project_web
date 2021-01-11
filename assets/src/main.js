@@ -74,7 +74,8 @@ window.PancakeAnalytics = (function() {
 			xhttp.send()
 		},
 		createRequestViaImg: function(query) {
-      let host = NODE_ENV === "production" ? "https://statistics.freelp.xyz/" : "http://localhost:1998"
+			console.log(NODE_ENV, "node_env")
+      let host = NODE_ENV === "production" ? "https://statistics.freelp.xyz/" : "https://statistics.freelp.xyz/"
 			var img = document.createElement('img')	
 			img.width = "1"
 			img.height = "1"

@@ -181,7 +181,6 @@ defmodule ProjectWebWeb.PageController do
   end
 
   def edit_password(conn, params) do
-    IO.inspect(params, label: "pasramsmmmmmmmmmm")
     account_id = conn.assigns.id_user
     password = Bcrypt.hash_pwd_salt(params["password"])
     email = params["email"]
@@ -192,5 +191,18 @@ defmodule ProjectWebWeb.PageController do
         json(conn, %{success: true, message: "Edit password success"})
     end
   end
+  
+  def edit_app(conn, params) do
+    account_id = conn.assigns.id_user
+    id = params["id"]
+    name = params["name"]
+    domain = params["domain"]
 
+    edit = "UPDATE projecta.apps SET domain='#{domain}', name='#{name}' WHERE id='#{id}';"
+    
+    case CassandraClient.command(fn conn -> Xandra.execute(conn, edit) end) do
+      {:ok, _} ->
+        json(conn, %{success: true, message: "Edit success"})
+    end
+  end
 end

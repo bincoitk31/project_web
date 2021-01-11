@@ -6,8 +6,6 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const { merge } = require("webpack-merge")
 const dev = process.env.NODE_ENV !== "production"
 console.log("|> node env:", process.env.NODE_ENV)
-console.log("|> hostname:", process.env.WCMS_HOSTNAME)
-console.log("|> origin:", process.env.WCMS_ORIGIN)
 
 let common = {
   stats: {
