@@ -26,7 +26,15 @@ export default (state = initState, action) => {
           apps: {$splice: [[idx, 1]] }
         })
       }
-
+      case "EDIT_APP": {
+        let idx = findIndex(state.apps, el => el.id == action.payload.id)
+        return update(state, {
+          apps: {
+            [idx] : {
+              $merge: action.payload
+          }}
+        })
+      }
     }
   })
 }

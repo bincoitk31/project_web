@@ -44,5 +44,20 @@ export const removeApp = params => {
     })
   }
 }
-
+export const editApp = params => {
+  return dispatch => {
+    axios.post(`api/private/edit_app`, params)
+    .then(res => {
+      if (res.status === 200 && res.data.success === true) {
+        dispatch({
+          type: "EDIT_APP",
+          payload: params
+        })
+      }
+    })
+    .catch(err => {
+      console.log(err, "err")
+    })
+  }
+}
 

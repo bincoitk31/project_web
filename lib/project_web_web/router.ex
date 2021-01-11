@@ -42,6 +42,7 @@ defmodule ProjectWebWeb.Router do
       get "/account", PageController, :get_account
       post "/edit_profile", PageController, :edit_profile
       post "/edit_password", PageController, :edit_password
+      post "/edit_app", PageController, :edit_app
     end
   end
 
