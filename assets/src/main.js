@@ -4,7 +4,7 @@ const version = 1
 const hostCount = window.location.host.split(".").length
 console.log('ver', version, hostCount)
 
-window.PancakeAnalytics = (function() {
+window.WebAnalytics = (function() {
 	// Specify the metadata of this Analytics library
 	var metadata = {
     "version": "1.0",
