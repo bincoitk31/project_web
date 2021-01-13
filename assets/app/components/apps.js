@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef, Component } from 'react';
-import { Table, Input, Button, Popconfirm, Modal } from 'antd';
+import { Table, Input, Button, Popconfirm, Modal, message } from 'antd';
 import { connect } from 'react-redux'
 import { createNewApp, getApps, removeApp, editApp } from '../actions/appsAction'
 
@@ -33,7 +33,7 @@ function Apps(props) {
       key: 'script',
       render: (text, record) => 
         apps.length >= 1 ? (
-          <a onClick={copyScript(record.id)} >Copy</a>
+          <a onClick={() => copyScript(record.id)} >Copy</a>
         ) : null
     },
     {
@@ -77,7 +77,7 @@ function Apps(props) {
     </script>
     `
     navigator.clipboard.writeText(script)
-    
+    message.success('Copied!');
   }
 
   const handleOk = () => {
@@ -92,6 +92,7 @@ function Apps(props) {
       createNewApp(params)
     }
     setVisible(false)
+    message.success('Success!');
   };
   
   const handleCancel = () => {
